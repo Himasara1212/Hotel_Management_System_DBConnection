@@ -1,6 +1,6 @@
 package com.sanduni.controller;
 
-import java.util.Scanner;
+import java.util.*;
 
 public class MainPageController {
     public void menuTitle(){

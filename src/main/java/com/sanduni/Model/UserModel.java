@@ -3,81 +3,177 @@ package com.sanduni.Model;
 import com.sanduni.db.DBConnection;
 import com.sanduni.Dto.UserDto;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserModel {
 
-    private Connection connection;
+    // Save user to database
+    public boolean saveUser(UserDto userDto) throws SQLException {
+        String sql = "INSERT INTO User (user_id, name, email, password) VALUES (?, ?, ?, ?)";
 
-    public UserModel() {
-        connection = DBConnection.getInstance().getConnection();
+        Connection connection = DBConnection.getInstance().getConnection();
+        PreparedStatement pstm = connection.prepareStatement(sql);
+
+        pstm.setString(1, userDto.getId());
+        pstm.setString(2, userDto.getUsername());
+        pstm.setString(3, userDto.getEmail());
+        pstm.setString(4, userDto.getPassword());
+
+        return pstm.executeUpdate() > 0;
     }
 
-    // Create user
-    public boolean addUser(UserDto user) {
-        String sql = "INSERT INTO users (id, username, password, email) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, user.getId());
-            stmt.setString(2, user.getUsername());
-            stmt.setString(3, user.getPassword());
-            stmt.setString(4, user.getEmail());
-            int rows = stmt.executeUpdate();
-            return rows > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+    // Update user in database
+    public boolean updateUser(UserDto userDto) throws SQLException {
+        String sql = "UPDATE User SET name = ?, email = ?, password = ? WHERE user_id = ?";
+
+        Connection connection = DBConnection.getInstance().getConnection();
+        PreparedStatement pstm = connection.prepareStatement(sql);
+
+        pstm.setString(1, userDto.getUsername());  // username from DTO maps to name in table
+        pstm.setString(2, userDto.getEmail());
+        pstm.setString(3, userDto.getPassword());
+        pstm.setString(4, userDto.getId());
+
+        return pstm.executeUpdate() > 0;
     }
 
-    // Read user by ID
-    public UserDto getUserById(String id) {
-        String sql = "SELECT * FROM users WHERE id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, id);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new UserDto(
-                        rs.getString("id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("email")
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    // Delete user from database
+    public boolean deleteUser(String userId) throws SQLException {
+        String sql = "DELETE FROM User WHERE user_id = ?";
+
+        Connection connection = DBConnection.getInstance().getConnection();
+        PreparedStatement pstm = connection.prepareStatement(sql);
+
+        pstm.setString(1, userId);
+
+        return pstm.executeUpdate() > 0;
+    }
+
+    // Get user by ID
+    public UserDto getUserById(String userId) throws SQLException {
+        String sql = "SELECT * FROM User WHERE user_id = ?";
+
+        Connection connection = DBConnection.getInstance().getConnection();
+        PreparedStatement pstm = connection.prepareStatement(sql);
+
+        pstm.setString(1, userId);
+
+        ResultSet resultSet = pstm.executeQuery();
+
+        if (resultSet.next()) {
+            return new UserDto(
+                    resultSet.getString("user_id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("email"),
+                    resultSet.getString("password")
+            );
         }
         return null;
     }
 
-    // Update user
-    public boolean updateUser(UserDto user) {
-        String sql = "UPDATE users SET username=?, password=?, email=? WHERE id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, user.getUsername());
-            stmt.setString(2, user.getPassword());
-            stmt.setString(3, user.getEmail());
-            stmt.setString(4, user.getId());
-            int rows = stmt.executeUpdate();
-            return rows > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+    // Get user by email
+    public UserDto getUserByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM User WHERE email = ?";
+
+        Connection connection = DBConnection.getInstance().getConnection();
+        PreparedStatement pstm = connection.prepareStatement(sql);
+
+        pstm.setString(1, email);
+
+        ResultSet resultSet = pstm.executeQuery();
+
+        if (resultSet.next()) {
+            return new UserDto(
+                    resultSet.getString("user_id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("email"),
+                    resultSet.getString("password")
+            );
         }
+        return null;
     }
 
-    // Delete user
-    public boolean deleteUser(String id) {
-        String sql = "DELETE FROM users WHERE id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, id);
-            int rows = stmt.executeUpdate();
-            return rows > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+    // Get all users
+    public List<UserDto> getAllUsers() throws SQLException {
+        String sql = "SELECT * FROM User";
+
+        Connection connection = DBConnection.getInstance().getConnection();
+        Statement statement = connection.createStatement();
+
+        ResultSet resultSet = statement.executeQuery(sql);
+
+        List<UserDto> users = new ArrayList<>();
+
+        while (resultSet.next()) {
+            UserDto userDto = new UserDto(
+                    resultSet.getString("user_id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("email"),
+                    resultSet.getString("password")
+            );
+            users.add(userDto);
         }
+
+        return users;
+    }
+
+    // Authenticate user
+    public UserDto authenticateUser(String email, String password) throws SQLException {
+        String sql = "SELECT * FROM User WHERE email = ? AND password = ?";
+
+        Connection connection = DBConnection.getInstance().getConnection();
+        PreparedStatement pstm = connection.prepareStatement(sql);
+
+        pstm.setString(1, email);
+        pstm.setString(2, password);
+
+        ResultSet resultSet = pstm.executeQuery();
+
+        if (resultSet.next()) {
+            return new UserDto(
+                    resultSet.getString("user_id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("email"),
+                    resultSet.getString("password")
+            );
+        }
+        return null;
+    }
+
+    // Check if user exists by email
+    public boolean isEmailExists(String email) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM User WHERE email = ?";
+
+        Connection connection = DBConnection.getInstance().getConnection();
+        PreparedStatement pstm = connection.prepareStatement(sql);
+
+        pstm.setString(1, email);
+
+        ResultSet resultSet = pstm.executeQuery();
+
+        if (resultSet.next()) {
+            return resultSet.getInt(1) > 0;
+        }
+        return false;
+    }
+
+    // Generate new user ID
+    public String generateNewUserId() throws SQLException {
+        String sql = "SELECT user_id FROM User ORDER BY user_id DESC LIMIT 1";
+
+        Connection connection = DBConnection.getInstance().getConnection();
+        Statement statement = connection.createStatement();
+
+        ResultSet resultSet = statement.executeQuery(sql);
+
+        if (resultSet.next()) {
+            String lastId = resultSet.getString("user_id");
+            int number = Integer.parseInt(lastId.substring(1));
+            return String.format("U%03d", number + 1);
+        }
+
+        return "U001";
     }
 }
