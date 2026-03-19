@@ -129,10 +129,10 @@ public class UserController {
                     user.getId(),
                     user.getUsername(),
                     user.getEmail(),
-                    user.getPassword()
+                    user.getPassword() // Password displayed as is (not hidden)
             );
         }
-        System.out.println("---------------------------------------------------------");
+        System.out.println("----------------------------------------------------------");
     }
 
     // Search user by ID
@@ -297,6 +297,6 @@ public class UserController {
         System.out.println("Name: " + user.getUsername());
         System.out.println("Email: " + user.getEmail());
         System.out.println("Password: " + user.getPassword());
-
+        System.out.println("===================================================");
     }
 }

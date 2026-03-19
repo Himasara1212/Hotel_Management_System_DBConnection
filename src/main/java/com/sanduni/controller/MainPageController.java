@@ -11,15 +11,26 @@ public class MainPageController {
 
     public void menu() {
         menuTitle();
-        System.out.print("1) Manage Guests.\t\t2) Manage Bookings.\n3) Change Credentials\nChoose Your Option : ");
+        System.out.print("1) Manage Guests.\t\t2) Manage Bookings.\n3) Change Credentials\t4) Manage User\nChoose Your Option : ");
         int option = new Scanner(System.in).nextInt();
         switch (option) {
-            case 1->{}
-            case 2->{}
-            case 3->{}
-            default->{
+            case 1 -> {
+                GuestController guestcontroller = new GuestController();
+                guestcontroller.showMenu();
+            }
+            case 2 -> {
+                System.out.println("Manage Bookings");
+            }
+            case 3 -> {
+                System.out.println("Change Credentials");
+            }
+            case 4 -> {
+                UserController usercontroller = new UserController();
+                usercontroller.showMenu();
+            }
+            default -> {
                 System.out.println("Invalid Option\n");
-                MainPageController.this.menu();
+                menu();
             }
         }
     }
