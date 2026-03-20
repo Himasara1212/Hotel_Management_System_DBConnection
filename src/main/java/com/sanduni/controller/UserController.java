@@ -18,7 +18,7 @@ public class UserController {
     // User login with username and password
     public void loginUser() {
         System.out.println("===================================================");
-        System.out.println("\t\t LOGIN PAGE");
+        System.out.println("\t\t\t\t     LOGIN PAGE");
         System.out.println("===================================================");
 
         System.out.print("Enter Username: ");

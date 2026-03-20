@@ -1,5 +1,6 @@
 package com.sanduni.controller;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class MainPageController {
@@ -9,13 +10,14 @@ public class MainPageController {
         System.out.println("===================================================");
     }
 
-    public void menu() {
+    public void menu() throws SQLException {
         menuTitle();
         System.out.print("1) Manage Guests.\t\t2) Manage Bookings.\n3) Change Credentials\nChoose Your Option : ");
         int option = new Scanner(System.in).nextInt();
         switch (option) {
             case 1 -> {
-                System.out.println("Manage Guests");
+                GuestController guestController = new GuestController();
+                guestController.guestMenu();
             }
             case 2 -> {
                 System.out.println("Manage Bookings");
