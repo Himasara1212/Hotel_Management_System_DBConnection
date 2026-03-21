@@ -186,7 +186,6 @@ public class GuestController {
 
         System.out.print("Enter Update guestID: ");
         String guest_id = scanner.next();
-        scanner.nextLine();
 
         GuestDto guest = guestModel.getGuest(guest_id);
 
@@ -252,6 +251,45 @@ public class GuestController {
         }
     }
 
+    private void deleteGuest() throws SQLException {
+        System.out.println("=================================================");
+        System.out.println("\t\t DELETE GUEST ");
+        System.out.println("==================================================");
+
+        System.out.print("Enter Delete guestID: ");
+        String guest_id = scanner.next();
+
+        GuestDto guest = guestModel.getGuest(guest_id);
+
+        if (guest == null) {
+            System.out.println("No guest found with ID: " + guest_id);
+            return;
+        }
+
+        System.out.println("\nGuest Details:");
+        System.out.println("ID: " + guest_id);
+        System.out.println("Name: " + guest.getName());
+        System.out.println("Address: " + guest.getAddress());
+        System.out.println("Country: " + guest.getCountry());
+        System.out.println("NIC: " + guest.getNic());
+        System.out.println("Email: " + guest.getEmail());
+        System.out.println("Contact: " + guest.getContact());
+        System.out.println("Member Count: " + guest.getMemberCount());
+
+
+        System.out.print("\nAre you sure you want to delete this guest? (y/n): ");
+        String confirm = scanner.next();
+
+        if (confirm.equalsIgnoreCase("y") || confirm.equalsIgnoreCase("Y")) {
+            if (guestModel.deleteGuest(guest_id)) {
+                System.out.println("Guest deleted successfully");
+            } else {
+                System.out.println("Guest deletion failed!");
+            }
+        } else {
+            System.out.println("Deletion cancelled!");
+        }
+    }
 }
 
 
